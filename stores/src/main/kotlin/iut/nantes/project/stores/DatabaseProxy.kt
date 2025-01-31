@@ -5,26 +5,37 @@ import iut.nantes.project.stores.controller.ContactDto
 import org.springframework.stereotype.Service
 
 private fun ContactEntity.toDto(): ContactDto =
-    ContactDto(id,email,phone, address.toDto())
+    ContactDto(id,email,phone, address!!.toDto())
 
 private fun ContactDto.toEntity(): ContactEntity {
-    val c = ContactEntity(contactId,email,phone, listOf())
-    c.address = address
+    val c = ContactEntity(contactId,email,phone,null)
+    c.address = address.toEntity()
     return c
 }
 
-private fun List<AddressEntity>.toDto(): AddressDto =
-    listOf(AddressDto(street, city, postalCode))
+private fun AddressEntity.toDto(): AddressDto =
+    AddressDto(id,street, city, postalCode)
 
-private fun List<AddressDto>.toEntity(): AddressEntity =
-    AdressEntity(street,city,postalCode)
+private fun AddressDto.toEntity(): AddressEntity =
+    AddressEntity(addressId,street,city,postalCode)
 
 @Service
 class DatabaseProxy(private val contactJpa: ContactJpa) {
     fun saveContact(contactDto: ContactDto): ContactDto {
-        val contactEntity = contactDto.toEntity()
-        val savedContact = contactJpa.save(contactEntity)
-        return savedContact.toDto()
+//        val contactEntity = contactDto.toEntity()
+//        val savedContact = contactJpa.save(contactEntity)
+//        return savedContact.toDto()
+
+        val existingContact = contactDto.contactId?.let { findContactById(it) }
+        return if (existingContact != null) {
+            existingContact.email = contactDto.email
+            existingContact.phone = contactDto.phone
+            existingContact.address = contactDto.address
+            contactJpa.save(existingContact.toEntity()).toDto()
+        } else {
+            val contactEntity = contactDto.toEntity()
+            contactJpa.save(contactEntity).toDto()
+        }
     }
 
     fun findContactById(id: Int): ContactDto? {

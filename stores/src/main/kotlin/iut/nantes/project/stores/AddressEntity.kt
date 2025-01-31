@@ -11,6 +11,7 @@ import jakarta.persistence.Table
 data class AddressEntity(
     @Id @GeneratedValue
     @Column(name = "adress_id")
+    val id: Int?,
     val street: String,
     val city: String,
     val postalCode: String,

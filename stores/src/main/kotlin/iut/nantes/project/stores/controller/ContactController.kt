@@ -14,36 +14,34 @@ class ContactController(val db: DatabaseProxy) {
         return ResponseEntity.status(HttpStatus.CREATED).body(withId)
     }
 
-    @GetMapping("/api/v1/contacts/")
+    @GetMapping("/api/v1/contacts")
     fun getContacts(@RequestParam city: String?): ResponseEntity<List<ContactDto>> {
         val result = db.findAllContacts()
         return ResponseEntity.ok(result)
     }
 
     @GetMapping("/api/v1/contacts/{id}")
-    fun getContact(@PathVariable contactId: Int) = db.findContactById(contactId)?.let {
+    fun getContact(@PathVariable id: Int) = db.findContactById(id)?.let {
         ResponseEntity.ok(it)
     } ?: ResponseEntity.notFound().build()
 
     @PutMapping("/api/v1/contacts/{id}")
-    fun updateContact(@RequestBody contact: ContactDto, @PathVariable contactId: Int): ResponseEntity<ContactDto> {
-        if (contact.contactId != contactId) {
-            throw IllegalArgumentException("Contact ID in path and body do not match")
-        }
-        val previous = db.findContactById(contactId)
+    fun updateContact(@RequestBody contact: ContactDto, @PathVariable id: Int): ResponseEntity<ContactDto> {
+        val previous = db.findContactById(id)
         if (previous == null) {
-            throw IllegalStateException("Contact with ID ${contactId} not found")
+            throw IllegalStateException("Contact with ID ${id} not found")
         }else{
+            contact.contactId = previous.contactId
             db.saveContact(contact).let { return ResponseEntity.ok(it) }
         }
     }
 
     // Gérer le cas ou un magasin est lié (409)
     @DeleteMapping("/api/v1/contacts/{id}")
-    fun deleteStore(@PathVariable contactId: Int): ResponseEntity<Void> {
-        val previous = db.findContactById(contactId)
+    fun deleteStore(@PathVariable id: Int): ResponseEntity<Void> {
+        val previous = db.findContactById(id)
         return if (previous != null) {
-            db.deleteContactById(contactId)
+            db.deleteContactById(id)
             ResponseEntity.noContent().build()
         } else {
             ResponseEntity.notFound().build()

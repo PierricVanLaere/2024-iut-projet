@@ -13,6 +13,6 @@ data class ContactEntity (
     val id: Int?,
     val email: String,
     val phone: String,
-    @OneToMany(cascade = [CascadeType.ALL])
-    var address: List<AddressEntity> = listOf(),
+    @OneToOne(cascade = [CascadeType.ALL])
+    var address: AddressEntity? = null,
 )
