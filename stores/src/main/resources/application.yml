@@ -1,5 +1,13 @@
-
 spring:
   application.name: stores
-server:
-  port: 8082
+  jpa:
+    hibernate:
+      ddl-auto: create
+  datasource:
+    url: jdbc:h2:file:./data/storesdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+  h2:
+    console:
+      enabled: true
