@@ -17,7 +17,7 @@ interface StoreJpa : JpaRepository<StoreEntity, Int> {}
 data class StoreEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    val id: Int = 0,
 
     @Column(nullable = false, unique = true)
     @field:NotBlank(message = "Le nom ne peut pas être vide.")
@@ -46,4 +46,8 @@ data class ProductEntity(
 
     @Column(nullable = false)
     val quantity: Int,
+
+    @ManyToOne
+    @JoinColumn(name = "store_id", nullable = false) // Clé étrangère vers StoreEntity
+    val store: StoreEntity
 )

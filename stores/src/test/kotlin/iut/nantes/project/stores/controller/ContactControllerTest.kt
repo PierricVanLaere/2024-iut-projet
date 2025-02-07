@@ -24,8 +24,6 @@ class ContactControllerTest {
  @Autowired
  lateinit var mockMvc: MockMvc
 
- @Autowired
- lateinit var databaseProxy: DatabaseProxy
 
  @BeforeEach
  fun setup() {

@@ -2,12 +2,13 @@ package iut.nantes.project.stores
 
 import iut.nantes.project.stores.controller.AddressDto
 import iut.nantes.project.stores.controller.ContactDto
+import iut.nantes.project.stores.controller.StoreDto
 import org.springframework.stereotype.Service
 
-private fun ContactEntity.toDto(): ContactDto =
+fun ContactEntity.toDto(): ContactDto =
     ContactDto(id,email,phone, address!!.toDto())
 
-private fun ContactDto.toEntity(): ContactEntity {
+fun ContactDto.toEntity(): ContactEntity {
     val c = ContactEntity(contactId,email,phone,null)
     c.address = address.toEntity()
     return c
@@ -19,8 +20,15 @@ private fun AddressEntity.toDto(): AddressDto =
 private fun AddressDto.toEntity(): AddressEntity =
     AddressEntity(addressId,street,city,postalCode)
 
+fun StoreEntity.toDto(): StoreDto =
+    StoreDto(id,name,contact,products)
+
+fun StoreDto.toEntity(): StoreEntity =
+    StoreEntity(id,name,contact,products)
+
+
 @Service
-class DatabaseProxy(private val contactJpa: ContactJpa) {
+class DatabaseProxy(private val contactJpa: ContactJpa, private val storeJpa: StoreJpa) {
     fun saveContact(contactDto: ContactDto): ContactDto {
 //        val contactEntity = contactDto.toEntity()
 //        val savedContact = contactJpa.save(contactEntity)
@@ -49,5 +57,14 @@ class DatabaseProxy(private val contactJpa: ContactJpa) {
 
     fun deleteContactById(id: Int) {
         contactJpa.deleteById(id)
+    }
+
+    fun saveStore(storeRequest: StoreDto): StoreDto {
+        val storeEntity = storeRequest.toEntity()
+        return storeJpa.save(storeEntity).toDto()
+    }
+
+    fun findAllStores(): List<StoreDto> {
+        return storeJpa.findAll().map { it.toDto() }
     }
 }
