@@ -24,15 +24,25 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	testImplementation("org.springframework.boot:spring-boot-starter-test") {
+		exclude(group = "org.junit.vintage")
+	}
 
+	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 	testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.28.1")
-    testImplementation("io.mockk:mockk:1.13.12")
-    testImplementation("com.ninja-squad:springmockk:4.0.2")
+	testImplementation("io.mockk:mockk:1.13.12")
+	testImplementation("com.ninja-squad:springmockk:4.0.2")
 
 	implementation("io.github.oshai:kotlin-logging-jvm:7.0.3")
+
+	implementation("org.springframework.boot:spring-boot-starter-actuator")
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+	implementation("org.springframework.boot:spring-boot-starter-validation")
+	runtimeOnly("com.h2database:h2")
+
+	implementation("org.springframework.boot:spring-boot-starter-security")
+	implementation("org.springframework.cloud:spring-cloud-starter-gateway")
+
 }
 
 kotlin {
@@ -44,3 +54,4 @@ kotlin {
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
+

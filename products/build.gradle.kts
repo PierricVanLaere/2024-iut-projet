@@ -27,7 +27,7 @@ dependencies {
 
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 	testImplementation("org.springframework.boot:spring-boot-starter-test") {
-		exclude(group = "org.junit.vintage") // Exclure JUnit 4 si non utilis
+		exclude(group = "org.junit.vintage")
 	}
 
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
