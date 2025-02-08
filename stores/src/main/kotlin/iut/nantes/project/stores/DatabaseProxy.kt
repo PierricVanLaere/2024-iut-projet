@@ -3,6 +3,8 @@ package iut.nantes.project.stores
 import iut.nantes.project.stores.controller.AddressDto
 import iut.nantes.project.stores.controller.ContactDto
 import iut.nantes.project.stores.controller.StoreDto
+import iut.nantes.project.stores.controller.StoreUpdateRequest
+import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
 
 fun ContactEntity.toDto(): ContactDto =
@@ -28,7 +30,11 @@ fun StoreDto.toEntity(): StoreEntity =
 
 
 @Service
-class DatabaseProxy(private val contactJpa: ContactJpa, private val storeJpa: StoreJpa) {
+class DatabaseProxy(
+    private val contactJpa: ContactJpa,
+    private val storeJpa: StoreJpa,
+    private val productRepository: ProductRepository,
+) {
     fun saveContact(contactDto: ContactDto): ContactDto {
 //        val contactEntity = contactDto.toEntity()
 //        val savedContact = contactJpa.save(contactEntity)
@@ -67,4 +73,30 @@ class DatabaseProxy(private val contactJpa: ContactJpa, private val storeJpa: St
     fun findAllStores(): List<StoreDto> {
         return storeJpa.findAll().map { it.toDto() }
     }
+
+    fun getStoreById(id: Int): StoreEntity {
+        return storeJpa.findById(id).orElseThrow { NoSuchElementException("Store not found") }
+    }
+
+    fun updateStore(id: Int, storeUpdateRequest: StoreUpdateRequest): StoreEntity {
+        val store = storeJpa.findById(id).orElseThrow { NoSuchElementException("Store not found") }
+        val contact = contactJpa.findById(storeUpdateRequest.contactId)
+            .orElseThrow { IllegalArgumentException("Invalid contact ID") }
+
+        store.name = storeUpdateRequest.name
+        store.contact = contact
+
+        return storeJpa.save(store)
+    }
+
+    @Transactional
+    fun deleteStore(id: Int) {
+        val store = storeJpa.findById(id).orElseThrow { NoSuchElementException("Store not found") }
+
+        productRepository.deleteByStoreId(id)
+
+        storeJpa.delete(store)
+    }
 }
+
+
